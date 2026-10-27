@@ -1,4 +1,4 @@
-name: CI
+name: CI-CD
 
 on:
   push:
@@ -29,3 +29,21 @@ jobs:
         with:
           name: app-jar
           path: target/app.jar
+
+
+# --------- Despliegue Continuo (nuevo en la 2b) -----------
+deploy:
+    needs: build          # solo despliega si la CI paso en verde
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el .jar del job build
+        uses: actions/download-artifact@v6
+        with:
+          name: app-jar
+
+      - name: Desplegar en Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: TU-NOMBRE-DE-WEBAPP   # p2gps-idunico
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: app.jar
